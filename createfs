@@ -5,6 +5,7 @@ FOLDER="fs"
 SIZE_MB=64
 VOLUME_NAME="REDOS"
 
+
 [ -f "$IMG" ] && rm "$IMG"
 [ -f "$IMG.dmg" ] && rm "$IMG.dmg"
 
@@ -51,11 +52,29 @@ elif [[ "$OS_TYPE" == "Linux" ]]; then
     need_executable dd
     need_executable mkfs.exfat "exfatprogs"
 
+    MOUNTDIR="mnt"
+
     # 1. Create an empty image file
     dd if=/dev/zero of="$IMG" bs=1M count="$SIZE_MB"
 
     # 2. Format it as ExFAT
     mkfs.exfat -n "$VOLUME_NAME" "$IMG"
+
+    # 4. Mount-Verzeichnis vorbereiten
+    mkdir -p "$MOUNTDIR"
+
+    # 5. Mounten über Loopback
+    sudo mount -o loop "$IMG" "$MOUNTDIR"
+    
+    # 6. Dateien hineinkopieren (WICHTIG: ohne Anführungszeichen beim Wildcard!)
+    sudo cp -R "$FOLDER"/* "$MOUNTDIR/"
+    
+    # 7. Inhalt anzeigen
+    ls -l "$MOUNTDIR"
+    
+    # 8. Aushängen und aufräumen
+    sudo umount "$MOUNTDIR"
+    rmdir "$MOUNTDIR"
 else
     echo "Unknown OS: $OS_TYPE" >&2
     exit 1
