@@ -1,14 +1,17 @@
-.PHONY: all kernel user shared clean
+.PHONY: all kernel user shared clean cmd
 
-all: shared user kernel
+all: shared user cmd kernel
 	@echo "Build complete."
-	./createfs
+	bash createfs
 
 shared:
 	$(MAKE) -C shared
 
 user:
 	$(MAKE) -C user
+
+cmd:
+	$(MAKE) -C cmd
 
 kernel:
 	$(MAKE) -C kernel
@@ -17,9 +20,10 @@ clean:
 	$(MAKE) -C shared clean
 	$(MAKE) -C kernel clean
 	$(MAKE) -C user clean
+	$(MAKE) -C cmd clean
 
 run: all
-	./run
+	bash run
 
 debug: all
-	./rundebug
+	bash rundebug
